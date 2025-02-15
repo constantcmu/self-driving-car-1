@@ -10,3 +10,32 @@ body{
 #networkCanvas{
    background:black;
 }
+
+.controls {
+   position: fixed;
+   top: 20px;
+   left: 20px;
+   z-index: 100;
+   background: rgba(255,255,255,0.8);
+   padding: 10px;
+   border-radius: 5px;
+}
+
+.controls button {
+   padding: 8px 15px;
+   margin-right: 10px;
+   cursor: pointer;
+}
+
+.input-group {
+   margin-top: 10px;
+}
+
+.input-group label {
+   margin-right: 10px;
+}
+
+.input-group input {
+   width: 80px;
+   padding: 5px;
+}

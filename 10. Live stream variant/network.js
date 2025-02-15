@@ -24,7 +24,7 @@ class NeuralNetwork{
             level.biases[i]=lerp(
                level.biases[i],
                Math.random()*2-1,
-               amount
+               amount * NeuralNetwork.mutationRate
             )
          }
          for(let i=0;i<level.weights.length;i++){
@@ -32,13 +32,16 @@ class NeuralNetwork{
                level.weights[i][j]=lerp(
                   level.weights[i][j],
                   Math.random()*2-1,
-                  amount
+                  amount * NeuralNetwork.mutationRate
                )
             }
          }
       });
    }
 }
+
+NeuralNetwork.learningRate = 0.1; // ค่าเริ่มต้นของ learning rate
+NeuralNetwork.mutationRate = 1; // ค่าเริ่มต้นของ mutation rate
 
 class Level{
    constructor(inputCount,outputCount){

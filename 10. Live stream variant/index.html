@@ -5,6 +5,26 @@
    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+   <div class="controls">
+      <button onclick="restart()" id="restartBtn">Restart</button>
+      <div class="input-group">
+         <label for="carsCount">จำนวนรถ (100-1000):</label>
+         <input type="number" id="carsCount" min="100" max="1000" value="100">
+      </div>
+      <div class="input-group">
+         <label for="epochsCount">จำนวน Epochs:</label>
+         <input type="number" id="epochsCount" min="1" value="10">
+      </div>
+      <div class="input-group">
+         <label for="modelSelect">เลือก Model:</label>
+         <select id="modelSelect"></select>
+         <button onclick="loadSelectedModel()">Load Model</button>
+      </div>
+      <button onclick="showBestCar()" id="showBestCarBtn">Show Best Car</button>
+      <button onclick="resetSimulation()" id="resetBtn">Reset</button>
+      <button onclick="restartWithNewCount()" id="restartWithNewCountBtn">Restart with New Count</button>
+      <button onclick="startEpochs()" id="startEpochsBtn">Start Epochs</button>
+   </div>
    <canvas id="carCanvas"></canvas><canvas id="networkCanvas"></canvas>
    <script src="visualizer.js"></script>
    <script src="network.js"></script>
