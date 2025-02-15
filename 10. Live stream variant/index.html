@@ -24,6 +24,14 @@
       <button onclick="resetSimulation()" id="resetBtn">Reset</button>
       <button onclick="restartWithNewCount()" id="restartWithNewCountBtn">Restart with New Count</button>
       <button onclick="startEpochs()" id="startEpochsBtn">Start Epochs</button>
+      <div class="input-group">
+         <label for="distance">ระยะทาง:</label>
+         <span id="distance">0</span> เมตร
+      </div>
+      <div class="input-group">
+         <label for="bestDistance">ระยะทางที่มากที่สุด:</label>
+         <span id="bestDistance">0</span> เมตร
+      </div>
    </div>
    <canvas id="carCanvas"></canvas><canvas id="networkCanvas"></canvas>
    <script src="visualizer.js"></script>
