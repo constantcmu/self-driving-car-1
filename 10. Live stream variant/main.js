@@ -25,9 +25,7 @@ carsCountInput.addEventListener("change", (e) => {
 });
 
 const cars = generateCars(N);
-const traffic = [
-   new Car(100, -100, 30, 50, "DUMMY", 2)
-];
+const traffic = [];
 let bestCar = cars[0];
 
 if (localStorage.getItem("bestBrain")) {
@@ -118,7 +116,6 @@ function discard() {
 
 function restart() {
    traffic.length = 0;
-   traffic.push(new Car(100, -100, 30, 50, "DUMMY", 2));
 
    const newCars = generateCars(N);
    cars.length = 0;

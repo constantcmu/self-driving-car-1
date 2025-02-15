@@ -18,7 +18,7 @@ class Car {
       if (controlType != "DUMMY") {
          this.sensor = new Sensor();
          this.brain = new NeuralNetwork(
-            [this.sensor.rayCount, 16, 14, 12, 10, 8, 4] // เพิ่มจำนวนชั้นใน Neural Network เป็น 6 ชั้น
+            [this.sensor.rayCount, 16, 14, 12, 10, 8, 4] // เพิ่มจำนวนชั้นใน Neural Network
          );
       }
       this.controls = new Controls(controlType);
