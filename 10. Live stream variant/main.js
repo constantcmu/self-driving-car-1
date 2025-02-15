@@ -1,15 +1,18 @@
-carCanvas.height=window.innerHeight;
-carCanvas.width=200;
-networkCanvas.height=window.innerHeight;
-networkCanvas.width=298;
+carCanvas.height = window.innerHeight;
+carCanvas.width = 200;
+networkCanvas.height = window.innerHeight;
+networkCanvas.width = 298;
 
-const carCtx=carCanvas.getContext("2d");
-const networkCtx=networkCanvas.getContext("2d");
-const road=new Road(carCanvas.width/2,carCanvas.width*0.9);
-let N=100;
+const carCtx = carCanvas.getContext("2d");
+const networkCtx = networkCanvas.getContext("2d");
+const road = new Road(carCanvas.width / 2, carCanvas.width * 0.9);
+let N = 100;
 const carsCountInput = document.getElementById("carsCount");
-const epochsCountInput = document.getElementById("epochsCount");
-const modelSelect = document.getElementById("modelSelect");
+const distanceDisplay = document.getElementById("distance");
+const bestDistanceDisplay = document.getElementById("bestDistance");
+const runningCarsDisplay = document.getElementById("runningCars");
+
+let bestDistance = 0;
 
 carsCountInput.addEventListener("change", (e) => {
    const value = parseInt(e.target.value);
@@ -21,78 +24,90 @@ carsCountInput.addEventListener("change", (e) => {
    }
 });
 
-const cars=generateCars(N);
-const traffic=[
-   new Car(100,-100,30,50,"DUMMY",2)
+const cars = generateCars(N);
+const traffic = [
+   new Car(100, -100, 30, 50, "DUMMY", 2)
 ];
-let bestCar=cars[0];
-loadModelList();
+let bestCar = cars[0];
 
-if(localStorage.getItem("bestBrain")){
-   for(let i=0;i<cars.length;i++){
-      cars[i].brain=JSON.parse(
+if (localStorage.getItem("bestBrain")) {
+   for (let i = 0; i < cars.length; i++) {
+      cars[i].brain = JSON.parse(
          localStorage.getItem("bestBrain"));
-      if(i>0){
-         NeuralNetwork.mutate(cars[i].brain,0.4);
+      if (i > 0) {
+         NeuralNetwork.mutate(cars[i].brain, 0.4);
       }
    }
 }
 
 animate();
 
-function animate(){
-   for(let i=0;i<traffic.length;i++){
-      traffic[i].update([],[]);
+function animate() {
+   for (let i = 0; i < traffic.length; i++) {
+      traffic[i].update([], []);
    }
-   for(let i=0;i<cars.length;i++){
-      cars[i].update(road.borders,traffic);
+   for (let i = 0; i < cars.length; i++) {
+      cars[i].update(road.borders, traffic);
    }
-   bestCar=cars.find(
-      c=>c.y==Math.min(
-         ...cars.map(c=>c.y)
+   bestCar = cars.find(
+      c => c.y == Math.min(
+         ...cars.map(c => c.y)
       ));
 
-   carCanvas.height=window.innerHeight;
-   networkCanvas.height=window.innerHeight;
-   
-   carCtx.translate(0,-bestCar.y+carCanvas.height*0.7);
+   carCanvas.height = window.innerHeight;
+   networkCanvas.height = window.innerHeight;
+
+   carCtx.translate(0, -bestCar.y + carCanvas.height * 0.7);
    road.draw(carCtx);
-   for(let i=0;i<traffic.length;i++){
+   for (let i = 0; i < traffic.length; i++) {
       traffic[i].draw(carCtx);
    }
-   carCtx.globalAlpha=0.2;
-   for(let i=0;i<cars.length;i++){
+   carCtx.globalAlpha = 0.2;
+   for (let i = 0; i < cars.length; i++) {
       cars[i].draw(carCtx);
    }
-   carCtx.globalAlpha=1;
-   bestCar.draw(carCtx,true);
+   carCtx.globalAlpha = 1;
+   bestCar.draw(carCtx, true, Math.abs(bestCar.y).toFixed(2));
 
-   Visualizer.drawNetwork(networkCtx,bestCar.brain);
-   
+   Visualizer.drawNetwork(networkCtx, bestCar.brain);
+
+   // แสดงระยะทาง
+   const currentDistance = Math.abs(bestCar.y).toFixed(2);
+   distanceDisplay.innerText = currentDistance;
+
+   // อัพเดทระยะทางที่มากที่สุด
+   if (parseFloat(currentDistance) > parseFloat(bestDistance)) {
+      bestDistance = currentDistance;
+      bestDistanceDisplay.innerText = bestDistance;
+   }
+
+   // แสดงจำนวนรถที่ยังวิ่งไม่หยุดและนับเฉพาะคันที่วิ่งไปข้างหน้า
+   const runningCars = cars.filter(car => car.speed > 0).length;
+   runningCarsDisplay.innerText = runningCars;
+
    requestAnimationFrame(animate);
 }
 
-function generateCars(N){
-   const cars=[];
-   for(let i=1;i<=N;i++){
-      cars.push(new Car(100,100,30,50,"AI"));
+function generateCars(N) {
+   const cars = [];
+   for (let i = 1; i <= N; i++) {
+      cars.push(new Car(100, 100, 30, 50, "AI"));
    }
    return cars;
 }
 
-function save(){
+function save() {
    try {
       const timestamp = new Date().toISOString();
       const modelName = `bestBrain_${timestamp}`;
       localStorage.setItem(modelName, JSON.stringify(bestCar.brain));
       alert("บันทึกสมองของรถเรียบร้อยแล้ว");
-      loadModelList();
    } catch (e) {
       alert("ไม่สามารถบันทึกสมองของรถได้");
    }
 }
 
-function discard(){
+function discard() {
    try {
       localStorage.removeItem("bestBrain");
       alert("ยกเลิกการบันทึกสมองของรถเรียบร้อยแล้ว");
@@ -101,104 +116,43 @@ function discard(){
    }
 }
 
-function restart(){
+function restart() {
    traffic.length = 0;
-   traffic.push(new Car(100,-100,30,50,"DUMMY",2));
-   
+   traffic.push(new Car(100, -100, 30, 50, "DUMMY", 2));
+
    const newCars = generateCars(N);
    cars.length = 0;
    cars.push(...newCars);
-   
+
    bestCar = cars[0];
-   
-   if(localStorage.getItem("bestBrain")){
-      for(let i=0;i<cars.length;i++){
-         cars[i].brain=JSON.parse(
+
+   if (localStorage.getItem("bestBrain")) {
+      for (let i = 0; i < cars.length; i++) {
+         cars[i].brain = JSON.parse(
             localStorage.getItem("bestBrain"));
-         if(i>0){
-            NeuralNetwork.mutate(cars[i].brain,0.4);
-         }
-      }
-   }
-}
-
-function showBestCar(){
-   cars.length = 1;
-}
-
-function resetSimulation(){
-   localStorage.removeItem("bestBrain");
-   location.reload();
-}
-
-function restartWithNewCount(){
-   N = parseInt(carsCountInput.value);
-   restart();
-}
-
-function startEpochs(){
-   const epochs = parseInt(epochsCountInput.value); // จำนวน epoch ที่ต้องการ
-   let bestBrain = null;
-   let bestScore = Infinity;
-
-   for (let epoch = 0; epoch < epochs; epoch++) {
-      restart();
-      for (let i = 0; i < cars.length; i++) {
-         cars[i].update(road.borders, traffic);
-      }
-      const currentBestCar = cars.find(
-         c => c.y == Math.min(...cars.map(c => c.y))
-      );
-      const currentScore = currentBestCar.y;
-
-      if (currentScore < bestScore) {
-         bestScore = currentScore;
-         bestBrain = currentBestCar.brain;
-      }
-   }
-
-   if (bestBrain) {
-      const timestamp = new Date().toISOString();
-      const modelName = `bestBrain_${timestamp}`;
-      localStorage.setItem(modelName, JSON.stringify(bestBrain));
-      alert("บันทึกสมองของรถที่ดีที่สุดเรียบร้อยแล้ว");
-      loadModelList();
-   }
-}
-
-function loadModelList(){
-   modelSelect.innerHTML = "";
-   for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key.startsWith("bestBrain_")) {
-         const option = document.createElement("option");
-         option.value = key;
-         option.text = key;
-         modelSelect.appendChild(option);
-      }
-   }
-}
-
-function loadSelectedModel(){
-   const selectedModel = modelSelect.value;
-   if (selectedModel) {
-      const bestBrain = JSON.parse(localStorage.getItem(selectedModel));
-      for (let i = 0; i < cars.length; i++) {
-         cars[i].brain = bestBrain;
          if (i > 0) {
             NeuralNetwork.mutate(cars[i].brain, 0.4);
          }
       }
-      alert("โหลดสมองของรถเรียบร้อยแล้ว");
    }
 }
 
+function resetSimulation() {
+   localStorage.removeItem("bestBrain");
+   location.reload();
+}
+
+function restartWithNewCount() {
+   N = parseInt(carsCountInput.value);
+   restart();
+}
+
 // เพิ่มฟังก์ชันการปรับปรุงการเรียนรู้
-function adjustLearningRate(rate){
+function adjustLearningRate(rate) {
    NeuralNetwork.learningRate = rate;
 }
 
 // เพิ่มฟังก์ชันการปรับปรุงการกลายพันธุ์
-function adjustMutationRate(rate){
+function adjustMutationRate(rate) {
    NeuralNetwork.mutationRate = rate;
 }

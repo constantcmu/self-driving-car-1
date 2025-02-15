@@ -11,19 +11,9 @@
          <label for="carsCount">จำนวนรถ (100-1000):</label>
          <input type="number" id="carsCount" min="100" max="1000" value="100">
       </div>
-      <div class="input-group">
-         <label for="epochsCount">จำนวน Epochs:</label>
-         <input type="number" id="epochsCount" min="1" value="10">
-      </div>
-      <div class="input-group">
-         <label for="modelSelect">เลือก Model:</label>
-         <select id="modelSelect"></select>
-         <button onclick="loadSelectedModel()">Load Model</button>
-      </div>
-      <button onclick="showBestCar()" id="showBestCarBtn">Show Best Car</button>
+      <!-- ลบส่วนที่เกี่ยวข้องกับการแสดงรถที่ดีที่สุด -->
       <button onclick="resetSimulation()" id="resetBtn">Reset</button>
       <button onclick="restartWithNewCount()" id="restartWithNewCountBtn">Restart with New Count</button>
-      <button onclick="startEpochs()" id="startEpochsBtn">Start Epochs</button>
       <div class="input-group">
          <label for="distance">ระยะทาง:</label>
          <span id="distance">0</span> เมตร
@@ -31,6 +21,10 @@
       <div class="input-group">
          <label for="bestDistance">ระยะทางที่มากที่สุด:</label>
          <span id="bestDistance">0</span> เมตร
+      </div>
+      <div class="input-group">
+         <label for="runningCars">จำนวนรถที่ยังวิ่งไม่หยุด:</label>
+         <span id="runningCars">0</span> คัน
       </div>
    </div>
    <canvas id="carCanvas"></canvas><canvas id="networkCanvas"></canvas>
